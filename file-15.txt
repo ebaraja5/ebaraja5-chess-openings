@@ -29,13 +29,11 @@ d5
 6.
 Bishop to d2
 
-This line has become quite critical in recent years. White's idea is to delay the development of the light-squared bishop so that in the event of ...d takes c4, Bishop takes c4 would win a tempo. Furthermore, White makes sure that a recapture with the bishop on c3 is always possible, so quite often a3 will be played, as ...Bishop takes c3 has now somewhat lost its appeal. Additionally, White clears the c1-square for the rook.
 
 6...
 
 b6
 
-I recommend setups starting with this move. After the trade on d5, we will often drop our dark-squared bishop back to either d6 or f8 (after ...Rook to e8.  . We will react depending on what White will do. If White puts the knight on e5, followed by f4, we will often undermine White's center with ...c5 and ...Knight to c6.
 
 7.
 
