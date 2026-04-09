@@ -1,0 +1,108 @@
+1.
+
+d4
+
+Knight to f6
+
+2.
+c4
+
+e6
+
+3.
+Knight to c3
+
+Bishop to b4
+
+4.
+e3
+
+4...
+
+short castle
+
+5.
+Knight to f3
+
+d5
+
+6.
+Bishop to d2
+
+This line has become quite critical in recent years. White's idea is to delay the development of the light-squared bishop so that in the event of ...d takes c4, Bishop takes c4 would win a tempo. Furthermore, White makes sure that a recapture with the bishop on c3 is always possible, so quite often a3 will be played, as ...Bishop takes c3 has now somewhat lost its appeal. Additionally, White clears the c1-square for the rook.
+
+6...
+
+b6
+
+I recommend setups starting with this move. After the trade on d5, we will often drop our dark-squared bishop back to either d6 or f8 (after ...Rook to e8.  . We will react depending on what White will do. If White puts the knight on e5, followed by f4, we will often undermine White's center with ...c5 and ...Knight to c6.
+
+7.
+
+c takes d5⚡
+
+7...
+
+e takes d5⚡
+
+8.
+Bishop to d3
+
+Bishop to d6
+
+It might look somewhat unnatural to move the same piece twice in the opening, but this move is the most accurate. We want to play ...Rook to e8 quickly as well, to stop White from playing Knight to e5.
+
+9.
+
+Knight to e5
+
+If White wants to get this move in, it should be done now, as otherwise, we will play ...Rook to e8, preventing White from posting the knight in the center.
+
+9...
+
+c5
+
+Putting pressure on White's center right away.
+
+10.
+
+Rook to c1
+
+Bishop to b7
+
+Preparing to put further pressure on d4 and e5 with ...Knight to c6.
+
+11.
+
+short castle
+
+Knight to c6
+
+12.
+Knight to g4
+
+Knight to e8
+
+13.
+f4
+
+13...
+
+f5
+
+14.
+Knight to e5
+
+c takes d4⚡
+
+15.
+Knight takes c6
+
+Bishop takes c6
+
+16.
+e takes d4⚡
+
+Queen to d7
+
+Protecting the pawn on f5, so we can play ...Knight to f6 next, after which Black is already slightly for choice.
