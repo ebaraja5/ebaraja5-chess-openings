@@ -1,0 +1,42 @@
+1.
+
+d4
+
+Knight to f6
+
+2.
+c4
+
+e6
+
+3.
+Knight to c3
+
+Bishop to b4
+
+4.
+e3
+
+4...
+
+short castle
+
+5.
+Bishop to d2
+
+b6
+
+6.
+
+a3
+
+6...
+
+Bishop takes c3
+
+7.
+Bishop takes c3
+
+Knight to e4
+
+We will get rid of White's bishop pair in the near future and have a fine game. Our c8-bishop will have a fine spot on b7 and after a subsequent ...d6, the b8-knight will likely go to f6 via d7. This is not a line we should worry about.
