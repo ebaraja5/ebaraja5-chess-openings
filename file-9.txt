@@ -1,0 +1,120 @@
+1.
+
+d4
+
+Knight to f6
+
+2.
+c4
+
+e6
+
+3.
+Knight to c3
+
+Bishop to b4
+
+4.
+e3
+
+4...
+
+short castle
+
+5.
+Knight to f3
+
+d5
+
+6.
+Bishop to d2
+
+This line has become quite critical in recent years. White's idea is to delay the development of the light-squared bishop so that in the event of ...d takes c4, Bishop takes c4 would win a tempo. Furthermore, White makes sure that a recapture with the bishop on c3 is always possible, so quite often a3 will be played, as ...Bishop takes c3 has now somewhat lost its appeal. Additionally, White clears the c1-square for the rook.
+
+6...
+
+b6
+
+I recommend setups starting with this move. After the trade on d5, we will often drop our dark-squared bishop back to either d6 or f8 (after ...Rook to e8.  . We will react depending on what White will do. If White puts the knight on e5, followed by f4, we will often undermine White's center with ...c5 and ...Knight to c6.
+
+7.
+
+c takes d5⚡
+
+7...
+
+e takes d5⚡
+
+8.
+Rook to c1
+
+Bishop to b7
+
+9.
+
+Bishop to d3
+
+Rook to e8
+
+10.
+Knight to b5
+
+10...
+
+Bishop to f8
+
+We want to drop the bishop back before playing ...c5 because if we leave the bishop on b4, White could force us to give it up with a3.
+
+11.
+
+short castle
+
+c5
+
+Exerting pressure on White’s center.
+
+12.
+
+f4
+
+Strengthening the knight on e5.
+
+12...
+
+Knight to c6
+
+Exerting more pressure on the d4-pawn. Now ...c takes d4 is a threat that White has to address somehow.
+
+13.
+
+Bishop to b5
+
+White addresses the threat on the d4-pawn by pinning the knight on c6. However, we easily have this covered.
+
+13...
+
+Rook to c8
+
+Activating the rook and defending the knight on c6.
+
+14.
+
+Bishop to e1
+
+The point behind this move is to play Bishop to h4 and exert pressure on the f6-knight. Before White is able to do so, we will play:
+
+14...
+
+a6
+
+Attacking the bishop on b5 in order to break the pin on our knight on c6.
+
+15.
+
+Bishop takes c6
+
+15...
+
+Bishop takes c6
+
+Next, we will drop the bishop back to b7, and we can always follow up with ...c takes d4, ...b5, and ...Queen to b6.
