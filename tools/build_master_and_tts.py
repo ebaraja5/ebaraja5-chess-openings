@@ -83,7 +83,7 @@ _MOVE_TOKEN_RE = re.compile(
     r"|[a-h][1-8]"                                              # pawn destination
     r"|[a-h]\s+takes\s+[a-h][1-8]"                             # pawn capture
     r"|short\s+castle|long\s+castle"                            # castling
-    r"|[bcdefgh]\d+[⚡✓]?"                                      # simple pawn push
+    r"|[a-h]\d+[⚡✓]?"                                         # simple pawn push
     r"|[a-h]\s+takes\s+\w+[⚡✓]?"                              # pawn capture variant
     r")$",
     re.IGNORECASE,
@@ -98,6 +98,12 @@ SPEED_MOVE = 1.12     # new move lines / all lines in a main-line file
 SPEED_LONG_COMMENT = 1.05  # new long-commentary lines in a derivative file
 
 LONG_COMMENT_THRESHOLD = 80  # characters; above this → SPEED_LONG_COMMENT
+MIN_COMMENTARY_LENGTH = 10   # characters; below this a multi-word line is not treated as commentary
+#: Minimum shared-prefix lines for a file to be treated as "derivative"
+#: (i.e., a continuation of the immediately prior variation).  If a file
+#: shares fewer than this many leading lines with its predecessor, it is
+#: treated as a new main-line file (all speeds 1.12).
+NEW_MAINLINE_PREFIX_THRESHOLD = 6
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -127,7 +133,7 @@ def is_commentary(line: str) -> bool:
     if _MOVE_TOKEN_RE.match(stripped):
         return False
     # If it contains a space and is reasonably long, it's commentary.
-    if " " in stripped and len(stripped) > 10:
+    if " " in stripped and len(stripped) > MIN_COMMENTARY_LENGTH:
         return True
     return False
 
@@ -488,7 +494,7 @@ def build_all_files(
         elif file_idx == min(parsed.keys()):
             # Always treat the very first file as main-line.
             is_main = True
-        elif prev_lines and find_prefix_length(lines, prev_lines) < 6:
+        elif prev_lines and find_prefix_length(lines, prev_lines) < NEW_MAINLINE_PREFIX_THRESHOLD:
             # Very short shared prefix → treat as a new main line.
             is_main = True
         else:

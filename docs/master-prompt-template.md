@@ -111,7 +111,7 @@ Using `master.txt` (and the original `.txt` files as reference for any stripped 
 **"Main-line file" detection rule:**
 A file is treated as a **main-line file** (all speeds at 1.12) if:
 - It is the first file in the dataset, **OR**
-- Its first move diverges from the previous file within the first 6 lines (i.e., `find_prefix_length(...) < 6`), indicating a completely different opening system or sub-variation group.
+- Its first move diverges from the previous file within the first `NEW_MAINLINE_PREFIX_THRESHOLD` lines (default: 6) — i.e., `find_prefix_length(...) < NEW_MAINLINE_PREFIX_THRESHOLD` — indicating a completely different opening system or sub-variation group.
 
 Otherwise it is a **derivative file** and the prefix/tail logic applies.
 
