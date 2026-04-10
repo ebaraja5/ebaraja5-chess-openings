@@ -490,7 +490,7 @@ FILES = [
             ("13... Rook to c8", 1.12),
             ("Activating the rook and defending the knight on c6.", 1.05),
             ("14. Bishop to e1", 1.12),
-            ("The point behind this move is to play Bishop to h4 and exert pressure on the f6-knight. Before White is able to do so, we will play:", 1.12),
+            ("The point behind this move is to play Bishop to h4 and exert pressure on the f6-knight. Before White is able to do so, we will play:", 1.05),
             ("14... a6", 1.12),
             ("Attacking the bishop on b5 in order to break the pin on our knight on c6.", 1.05),
             ("15. Bishop takes c6", 1.12),
@@ -530,7 +530,7 @@ FILES = [
             ("12... Knight to c6", 1.45),
             ("Exerting more pressure on the d4-pawn. Now ...c takes d4 is a threat that White has to address somehow.", 1.45),
             ("13. Knight takes d5", 1.12),
-            ("As flashy as this move looks, it leads to a forced draw... or a wild position after Black has sacrificed the queen!", 1.12),
+            ("As flashy as this move looks, it leads to a forced draw... or a wild position after Black has sacrificed the queen!", 1.05),
             ("13... Queen takes d5", 1.12),
             ("14. Bishop to c4", 1.12),
             ("14... Queen takes g2 check", 1.12),
@@ -867,57 +867,3 @@ FILES = [
     ),
 ]
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────────────────────────────────────────
-
-def synthesize(text: str, speed: float):
-    audio_chunks = []
-    generator = pipeline(text, voice=VOICE, speed=speed, split_pattern=r'\n+')
-    for _, _, audio in generator:
-        if audio is not None and len(audio) > 0:
-            audio_chunks.append(audio)
-    if not audio_chunks:
-        return np.zeros(0, dtype=np.float32)
-    return np.concatenate(audio_chunks)
-
-def save_mp3(segments, out_path: Path):
-    all_audio = []
-    for text, speed in segments:
-        text = text.strip()
-        if not text:
-            continue
-        audio = synthesize(text, speed)
-        if len(audio) > 0:
-            all_audio.append(audio)
-
-    if not all_audio:
-        print(f"  WARNING: no audio generated for {out_path.name}")
-        return
-
-    combined = np.concatenate(all_audio).astype(np.float32)
-
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-        tmp_path = tmp.name
-
-    sf.write(tmp_path, combined, 24000)
-    audio_seg = AudioSegment.from_wav(tmp_path)
-    audio_seg.export(out_path, format="mp3", bitrate="192k")
-    os.unlink(tmp_path)
-
-    print(f"  Saved: {out_path}")
-
-def main():
-    for filename, segments in FILES:
-        out_path = OUTPUT_DIR / filename
-        if out_path.exists():
-            print(f"⏭  {out_path.name} already exists")
-            continue
-        print(f"⏳ Generating {out_path.name}...")
-        save_mp3(segments, out_path)
-
-    print("\n✅ All done!")
-
-if __name__ == "__main__":
-    main()
