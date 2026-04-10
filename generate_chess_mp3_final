@@ -5,6 +5,33 @@ Manual Chess DOCX -> MP3 TTS Generator
 - Repeated opening text uses speed 1.45
 - New content uses speed 1.12
 - Longer explanation lines use speed 1.05
+
+─────────────────────────────────────────────────────────────────
+HOW TO USE THE HELPER MODULE (tools/build_master_and_tts.py)
+─────────────────────────────────────────────────────────────────
+Instead of maintaining the FILES list below by hand, you can
+generate it automatically from a "new files" combined source:
+
+    from tools.build_master_and_tts import (
+        parse_new_files_source,
+        build_all_files,
+    )
+    SOURCE = (
+        "Rubinstein System 4.e3 O-O 5.Bd2 & Nf3/new files"
+    )
+    # Indices of files that are "main lines" (all speeds 1.12).
+    # FILE 1 = Bd2 #1, FILE 6 = Nf3 #1.
+    MAIN_LINE_INDICES = {1, 6}
+
+    def naming_fn(idx, label):
+        return label.strip() + ".mp3"
+
+    parsed = parse_new_files_source(SOURCE)
+    FILES = list(build_all_files(parsed, MAIN_LINE_INDICES, naming_fn))
+
+See docs/master-prompt-template.md for the full three-phase
+interactive workflow description.
+─────────────────────────────────────────────────────────────────
 """
 
 import os
