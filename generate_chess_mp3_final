@@ -53,37 +53,61 @@ _TEXT_FILE = (
 # the shortest commentary line is 25 chars ("Defending the pawn on d4.").
 _COMMENTARY_THRESHOLD = 21
 
+# Compiled once at module level for performance.
+_FILE_MARKER_PATTERN = re.compile(r"^===FILE \d+===\s*(.+)$", re.MULTILINE)
+
 
 def _is_commentary(line: str) -> bool:
     return len(line) > _COMMENTARY_THRESHOLD
 
 
-def _parse_new_files(path: Path):
-    """Parse the 'new files' document into a FILES-compatible list."""
+def _parse_new_files(
+    path: Path,
+) -> "list[tuple[str, list[tuple[str, float]]]]":
+    """Parse the 'new files' text document into a FILES-compatible list.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the text file containing the 19 chess-opening blocks,
+        each preceded by a ``===FILE N=== <name>`` header line.
+
+    Returns
+    -------
+    list of (filename, segments) tuples, where *segments* is a list of
+    (text, speed) pairs ready for use by :func:`save_mp3`.
+
+    Raises
+    ------
+    FileNotFoundError
+        If *path* does not exist.
+    ValueError
+        If no ``===FILE N===`` markers are found in the file.
+    """
     text = path.read_text(encoding="utf-8")
 
-    # Each block starts with a line like: ===FILE N=== <mp3 name without .mp3>
-    marker_pattern = re.compile(r"^===FILE \d+===\s*(.+)$", re.MULTILINE)
-    matches = list(marker_pattern.finditer(text))
+    matches = list(_FILE_MARKER_PATTERN.finditer(text))
+    if not matches:
+        raise ValueError(f"No ===FILE N=== markers found in {path}")
 
-    blocks = []  # list of (name, [line, ...])
+    file_blocks = []  # list of (name, [line, ...])
     for i, match in enumerate(matches):
         name = match.group(1).strip()
         start = match.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
         content = text[start:end]
         lines = [ln.strip() for ln in content.splitlines() if ln.strip()]
-        blocks.append((name, lines))
+        file_blocks.append((name, lines))
 
     files = []
-    for idx, (name, lines) in enumerate(blocks):
+    for idx, (name, lines) in enumerate(file_blocks):
         filename = name + ".mp3"
 
         # FILE 1 → idx 0, FILE 6 → idx 5: all segments at speed 1.12
         if idx == 0 or idx == 5:
             segments = [(line, 1.12) for line in lines]
         else:
-            prev_lines = blocks[idx - 1][1]
+            prev_lines = file_blocks[idx - 1][1]
 
             # Determine common-prefix length vs previous file
             prefix_len = 0
