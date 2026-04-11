@@ -6,6 +6,20 @@ Copy-paste the relevant sections into **Copilot Chat** or **ChatGPT** when worki
 
 ---
 
+## How to use this file
+
+This is a **template** — copy the prompt blocks into an AI chat (Copilot Chat, ChatGPT, etc.) whenever you need to add a new set of opening variations to the TTS script.
+
+The workflow runs in three phases:
+
+| # | Phase | What you do |
+|---|-------|-------------|
+| **1** | **Capture & Clean** | Paste each raw line one at a time; the AI strips alternatives and metadata, and you save the clean result as a `.txt` file in the repository folder. |
+| **2** | **Build Master** | Paste all cleaned `.txt` files together; the AI combines them into a single `files 1-N.txt` where repeated commentary is removed so it is not voiced twice. |
+| **3** | **Generate TTS Segments** | Paste the combined file; the AI auto-detects which files are "main-line" starts, asks you to confirm, asks for your MP3 naming scheme, and gives you a ready-to-paste Python snippet. |
+
+---
+
 ## Overview
 
 The workflow has three phases:
@@ -277,10 +291,12 @@ Parse the combined file (or a `new files` source with `===FILE N===` markers) in
 
 | Condition | Speed |
 |-----------|-------|
-| FILE 1 and FILE 6 (first file of each group) — all lines | `1.12` |
-| FILE 2–5 and FILE 7–19 — lines **identical** to the prior file (common prefix) | `1.45` |
-| FILE 2–5 and FILE 7–19 — new move lines (from the first difference onward) | `1.12` |
-| FILE 2–5 and FILE 7–19 — new commentary / explanation lines | `1.05` |
+| **Main-line files** (first file of each group, auto-detected) — all lines | `1.12` |
+| **Non-main-line files** — lines **identical** to the prior file (common prefix) | `1.45` |
+| **Non-main-line files** — new move lines (from the first difference onward) | `1.12` |
+| **Non-main-line files** — new commentary / explanation lines | `1.05` |
+
+A **main-line file** is one where the common prefix with the previous file is **less than 25 % of its own length** (or it is the very first file). This detects group boundaries automatically regardless of how many files there are.
 
 A **commentary line** is any line that:
 - Is longer than 25 characters, **or**
@@ -316,14 +332,48 @@ def find_prefix_length(prev_lines: list[str], curr_lines: list[str]) -> int:
     return n
 
 
+def detect_main_line_files(raw_files: dict[int, list[str]]) -> set[int]:
+    """
+    Auto-detect which file numbers are 'main-line' files (all lines at 1.12).
+
+    A file is a main-line file if:
+    - It is the very first file in the dict, OR
+    - Its common prefix with the previous file is less than 25 % of its own
+      length (indicating a fresh group start, not a continuation).
+    """
+    if not raw_files:
+        return set()
+
+    file_numbers = sorted(raw_files.keys())
+    main_lines: set[int] = {file_numbers[0]}
+
+    for i in range(1, len(file_numbers)):
+        curr_no = file_numbers[i]
+        prev_no = file_numbers[i - 1]
+
+        curr_lines = [ln.strip() for ln in raw_files[curr_no] if ln.strip()]
+        prev_lines = [ln.strip() for ln in raw_files[prev_no] if ln.strip()]
+
+        if not curr_lines:
+            continue
+
+        prefix_len = find_prefix_length(prev_lines, curr_lines)
+        if prefix_len / len(curr_lines) < 0.25:
+            main_lines.add(curr_no)
+
+    return main_lines
+
+
 def build_segments_for_file(
-    file_number: int, raw_files: dict[int, list[str]]
+    file_number: int,
+    raw_files: dict[int, list[str]],
+    main_line_files: set[int],
 ) -> list[tuple[str, float]]:
     """
     Build a list of (text, speed) segments for the given file number.
 
     Speed rules:
-    - FILE 1 and FILE 6 (first of each group): all lines at 1.12.
+    - Main-line files (detected or user-confirmed): all lines at 1.12.
     - All other files:
         * Lines that match the common prefix with the prior file → 1.45
         * New lines (moves) after the first difference → 1.12
@@ -331,135 +381,188 @@ def build_segments_for_file(
     """
     lines = [ln.strip() for ln in raw_files[file_number] if ln.strip()]
 
-    # First file of each group: everything at 1.12
-    if file_number in (1, 6):
+    if file_number in main_line_files:
         return [(ln, 1.12) for ln in lines]
 
-    prev_lines = [ln.strip() for ln in raw_files.get(file_number - 1, []) if ln.strip()]
+    file_numbers = sorted(raw_files.keys())
+    idx = file_numbers.index(file_number)
+    prev_no = file_numbers[idx - 1]
+    # If prev_no is not in raw_files, get() returns [], so diff_idx becomes 0
+    # and the entire current file is treated as new content (all 1.12 / 1.05).
+    prev_lines = [ln.strip() for ln in raw_files.get(prev_no, []) if ln.strip()]
     diff_idx = find_prefix_length(prev_lines, lines)
 
     segments: list[tuple[str, float]] = []
 
-    # Common prefix → read fast (1.45)
     for i in range(diff_idx):
         segments.append((lines[i], 1.45))
 
-    # New tail → 1.12 for moves, 1.05 for commentary
     for i in range(diff_idx, len(lines)):
         ln = lines[i]
         speed = 1.05 if is_commentary(ln) else 1.12
         segments.append((ln, speed))
 
     return segments
+
+
+def build_all_tts_files(
+    raw_files: dict[int, list[str]],
+    mp3_names: dict[int, str],
+    main_line_files: set[int] | None = None,
+) -> list[tuple[str, list[tuple[str, float]]]]:
+    """
+    Build FILES-compatible entries for every file number present in raw_files.
+
+    Parameters
+    ----------
+    raw_files      : {file_number: [lines...]}
+    mp3_names      : {file_number: "Output Name.mp3"}
+    main_line_files: set of file numbers that are main-line files (all 1.12).
+                     If None, the set is auto-detected by detect_main_line_files().
+    """
+    if main_line_files is None:
+        main_line_files = detect_main_line_files(raw_files)
+
+    entries = []
+    for file_no in sorted(raw_files.keys()):
+        mp3_name = mp3_names.get(file_no)
+        if mp3_name is None:
+            continue
+        segments = build_segments_for_file(file_no, raw_files, main_line_files)
+        entries.append((mp3_name, segments))
+    return entries
 ```
 
 ### Populating RAW_FILES
 
-`RAW_FILES` is a plain dict mapping file number → list of text lines. You do **not** add speeds here — just the raw text in order:
+`RAW_FILES` is a plain dict mapping file number → list of text lines. You do **not** add speeds here — just the raw text in order. The file numbers start at 1 and go up to however many files you have (could be 5, could be 75):
 
 ```python
 RAW_FILES: dict[int, list[str]] = {
-    # ── Bd2 group (FILES 1–5) ───────────────────────────────────────────────
     1: [
         "1. d4",
         "Knight to f6",
         "2. c4",
         "e6",
-        "3. Knight to c3",
-        "Bishop to b4",
-        "4. e3",
-        "4... short castle",
-        "5. Bishop to d2",
-        "b6",
-        "6. a3",
-        "6... Bishop takes c3",
-        "7. Bishop takes c3",
-        "Knight to e4",
-        "We will get rid of White's bishop pair in the near future and have a fine game. "
-        "Our c8-bishop will have a fine spot on b7 and after a subsequent ...d6, the "
-        "b8-knight will likely go to f6 via d7. This is not a line we should worry about.",
+        # ... all lines for FILE 1 ...
     ],
     2: [
         "1. d4",
         "Knight to f6",
-        # … (lines up to first difference are the same as FILE 1)
-        "6. Bishop to d3",
-        "6... d5",
-        # … new lines continue here
+        # ... lines up to the first difference are the same as FILE 1 ...
+        # ... new tail continues here ...
     ],
-    # … entries 3, 4, 5 …
-
-    # ── Nf3 group (FILES 6–19) ──────────────────────────────────────────────
-    6: [
-        "1. d4",
-        "Knight to f6",
-        "2. c4",
-        "e6",
-        "3. Knight to c3",
-        "Bishop to b4",
-        "4. e3",
-        "4... short castle",
-        "5. Knight to f3",
-        "d5",
-        # … all lines for FILE 6 …
-    ],
-    7: [
-        # … lines for FILE 7 …
-    ],
-    # … entries 8–19 …
+    # ... entries 3, 4, 5 etc. ...
 }
 ```
 
 ### Building all FILES entries automatically
 
+Provide a `mp3_names` dict that maps each file number to the desired output filename, then call `build_all_tts_files`:
+
 ```python
-def build_all_rubinstein_files(
-    raw_files: dict[int, list[str]]
-) -> list[tuple[str, list[tuple[str, float]]]]:
-    """
-    Build FILES-compatible entries for all 19 logical files:
-      FILE  1–5  →  "Rubinstein System 4.e3 O-O 5.Bd2 #1.mp3" … #5.mp3
-      FILE  6–19 →  "Rubinstein System 4.e3 O-O 5.Nf3 #1.mp3" … #14.mp3
-    """
-    mapping: dict[int, str] = {}
-    for n in range(1, 6):
-        mapping[n] = f"Rubinstein System 4.e3 O-O 5.Bd2 #{n}.mp3"
-    for idx, n in enumerate(range(6, 20), start=1):
-        mapping[n] = f"Rubinstein System 4.e3 O-O 5.Nf3 #{idx}.mp3"
+# Map file numbers to output MP3 filenames.
+# Edit these names to match your opening and numbering scheme.
+MP3_NAMES: dict[int, str] = {
+    1: "My Opening #1.mp3",
+    2: "My Opening #2.mp3",
+    3: "My Opening #3.mp3",
+    # ... one entry per file ...
+}
 
-    entries = []
-    for file_no, mp3_name in mapping.items():
-        if file_no not in raw_files:
-            continue
-        segments = build_segments_for_file(file_no, raw_files)
-        entries.append((mp3_name, segments))
-    return entries
+# Auto-detect main-line files and build all FILES entries:
+FILES.extend(build_all_tts_files(RAW_FILES, MP3_NAMES))
 
-
-# Extend your existing FILES list:
-FILES.extend(build_all_rubinstein_files(RAW_FILES))
+# ── Optional: override the auto-detected main-line files ────────────────────
+# If the auto-detection is wrong, specify the main-line file numbers manually:
+#
+# MAIN_LINE_FILES = {1, 8}   # e.g. FILE 1 and FILE 8 are group starts
+# FILES.extend(build_all_tts_files(RAW_FILES, MP3_NAMES, main_line_files=MAIN_LINE_FILES))
 ```
 
 ### Prompt to give the AI (Phase 3)
 
+This is a **multi-step interactive prompt**. Send the first message, then follow the AI's questions one step at a time.
+
+**Step 1 — Parse the combined file**
+
 ````
-I have a chess opening file that contains 19 variations separated by markers like:
+You are helping me build TTS audio files for chess openings.
 
-  ===FILE 1=== Rubinstein System 4.e3 O-O 5.Bd2 #1
-  …
-  ===FILE 19=== Rubinstein System 4.e3 O-O 5.Nf3 #14
+I will paste a combined chess opening file. Each variation is separated by a header
+in one of two formats:
 
-Please parse it and produce a Python `RAW_FILES` dict (file number → list of
-text lines) using the following rules:
+  ===== FILE N =====      (from the Phase 2 output)
+  ===FILE N=== Name       (from the compact "new files" format)
 
-- Strip blank lines between entries; each move or commentary text is one list item.
-- Do NOT add speeds — just the raw text strings.
-- FILE 1 and FILE 6 are the first files of their respective groups and need no
-  comparison.
+Please:
+1. Parse the file into a dict: RAW_FILES = {file_number: [list of text lines]}.
+   - Strip blank lines; each move or commentary sentence becomes one list item.
+   - Do NOT add any speeds — plain text strings only.
+2. Auto-detect which files are "main-line" files using this rule:
+   - FILE 1 is always a main-line file.
+   - Any other FILE N is a main-line file if its common prefix with FILE N-1
+     is less than 25 % of its own length.
+3. Show me the detected main-line file numbers and a one-line reason for each
+   (e.g. "FILE 6 — prefix with FILE 5 is only 4/32 lines = 12.5 %").
+4. Ask me: "Are these main-line files correct, or do you want to add/remove any?"
 
-Here is the source text:
+Here is the combined file:
 [PASTE YOUR COMBINED FILE CONTENT HERE]
 ````
+
+---
+
+**Step 2 — Confirm or override main-line files**
+
+After the AI shows you the detected main-line files, reply with one of:
+
+- `"Yes, those are correct."` — proceed with auto-detected set.
+- `"Add FILE 3, remove FILE 8."` — adjust the set and proceed.
+- List the exact file numbers you want: `"Main-line files: 1, 7, 14."` — use exactly these.
+
+---
+
+**Step 3 — Provide your MP3 naming scheme**
+
+The AI will then ask you how to name the output MP3 files. Reply with the pattern, for example:
+
+- `"Rubinstein System 4.e3 O-O 5.Bd2 #1.mp3 through #5.mp3, then Rubinstein System 4.e3 O-O 5.Nf3 #1.mp3 through #14.mp3"`
+- `"King's Indian Defense #1.mp3, #2.mp3, … up to however many files there are"`
+- Or paste a ready-made list, one name per line.
+
+---
+
+**Step 4 — Receive the Python snippet**
+
+The AI will produce a ready-to-paste snippet like the one below. Add it to your script just after the `FILES = [...]` definition:
+
+```python
+# ── [Opening name] ───────────────────────────────────────────────────────────
+RAW_FILES: dict[int, list[str]] = {
+    1: [
+        "1. d4",
+        "Knight to f6",
+        # … all lines …
+    ],
+    2: [
+        "1. d4",
+        "Knight to f6",
+        # … lines …
+    ],
+    # … remaining entries …
+}
+
+MP3_NAMES: dict[int, str] = {
+    1: "Opening Name #1.mp3",
+    2: "Opening Name #2.mp3",
+    # … one entry per file …
+}
+
+MAIN_LINE_FILES = {1, 6}   # confirmed or overridden in Step 2
+
+FILES.extend(build_all_tts_files(RAW_FILES, MP3_NAMES, main_line_files=MAIN_LINE_FILES))
+```
 
 ---
 
@@ -503,7 +606,7 @@ When working with an AI assistant (Copilot Chat or ChatGPT) using this workflow:
 3. **Keep commentary rules consistent.** Commentary is preserved only from the move where it first differs from the prior file. If you want commentary to start from a specific move number (e.g. "keep commentary from move 27 onward"), state that explicitly.
 4. **Review generated speeds.** After Phase 3, scan the generated `FILES` entry and verify the 1.45 / 1.12 / 1.05 assignments look right, especially around the transition point.
 5. **Don't modify existing `FILES` entries.** The script processes the `FILES` list in order and skips already-generated MP3s. Appending new entries is always safe.
-6. **Extend, don't replace.** Use `FILES.extend(build_all_rubinstein_files(RAW_FILES))` to add new entries rather than manually editing the hardcoded list.
+6. **Extend, don't replace.** Use `FILES.extend(build_all_tts_files(RAW_FILES, MP3_NAMES))` to add new entries rather than manually editing the hardcoded list.
 
 ---
 
