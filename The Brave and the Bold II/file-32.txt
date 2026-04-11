@@ -1,0 +1,54 @@
+===FILE 32===
+1.
+b3
+We just give Black the centre, a false sense of security... Only to take all of them back with interest at the right time!
+1...
+e5
+2.
+Bishop to b2
+Black is well advised to transpose to 1...e5 territory! Returning now to our main line.
+Main line... 2.
+Bishop to b2
+d6
+3.
+c4
+I feel this is the most critical attempt, but for some reason, it is only the 3rd most popular move after e3 and g3!
+This is less commital as we keep all options involving both e3 and g3 ideas open.
+3...
+Knight to f6
+4.
+Knight to c3
+We keep our kingside development plans hidden.
+4...
+g6
+5.
+d4
+Strike them when it's hot!
+5...
+e4
+6.
+e3
+Bishop to g7
+7.
+Knight g to e2
+As a rule after Black commits e4, our g1-knight should head to f4.
+7...
+short castle
+8.
+Knight to f4
+The knight is well placed on f4.
+8...
+c6
+9.
+Bishop to e2
+With an interesting French type position.
+9...
+a5
+10.
+h3
+The Comp's top choice. One day we will have to go for Queen to d2 and then Black will have ideas like g5 Knight to h5 Knight to h5 Bishop to h5... It is a precautionary measure against that plan. 😀 Way too deep even for me!
+10...
+Knight to a6
+11.
+short castle
+One day we will break through with f3 after careful preparation.

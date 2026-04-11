@@ -1,0 +1,53 @@
+===FILE 8===
+1.
+b3
+We just give Black the centre, a false sense of security... Only to take all of them back with interest at the right time!
+1...
+e5
+2.
+Bishop to b2
+Black is well advised to transpose to 1...e5 territory! Returning now to our main line.
+Main line... 2.
+Bishop to b2
+d6
+3.
+c4
+I feel this is the most critical attempt, but for some reason, it is only the 3rd most popular move after e3 and g3!
+This is less commital as we keep all options involving both e3 and g3 ideas open.
+3...
+f5
+4.
+e3
+4...
+Knight to f6
+5.
+d4
+e4
+This opens up a couple of weaknesses on f4 and g5 for our g1-knight.
+6.
+Knight to c3
+g6
+7.
+Knight to h3
+The knight is heading to its destined outpost on f4.
+7...
+Bishop to g7
+8.
+Knight to f4
+short castle
+9.
+h4
+With a clear advantage as we can go for long castling and follow it up with a kingside attack.
+I ran into this line in some bullet games... So I felt obliged to add it.
+9...
+Queen to e8
+10.
+c5
+The bishop is coming to c4 followed h5 and it will be game over for Black!
+10...
+d takes c5⚡
+11.
+Bishop to c4 check
+King to h8
+12.
+h5

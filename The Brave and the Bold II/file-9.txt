@@ -1,0 +1,75 @@
+===FILE 9===
+1.
+b3
+We just give Black the centre, a false sense of security... Only to take all of them back with interest at the right time!
+1...
+e5
+2.
+Bishop to b2
+Black is well advised to transpose to 1...e5 territory! Returning now to our main line.
+Main line... 2.
+Bishop to b2
+d6
+3.
+c4
+I feel this is the most critical attempt, but for some reason, it is only the 3rd most popular move after e3 and g3!
+This is less commital as we keep all options involving both e3 and g3 ideas open.
+3...
+f5
+4.
+e3
+4...
+Knight to f6
+5.
+d4
+e4
+This opens up a couple of weaknesses on f4 and g5 for our g1-knight.
+6.
+Knight to c3
+g6
+7.
+Knight to h3
+The knight is heading to its destined outpost on f4.
+7...
+Bishop to g7
+8.
+Knight to f4
+short castle
+9.
+h4
+With a clear advantage as we can go for long castling and follow it up with a kingside attack.
+I ran into this line in some bullet games... So I felt obliged to add it.
+9...
+c6
+10.
+h5
+Bringing the fight to h-file and the rook!
+10...
+g5
+11.
+h6
+Bishop to h8
+12.
+Knight to h3
+This is stronger than Knight to h5.
+12...
+Knight to g4
+13.
+Queen to d2
+Time to prepare long castling.
+13...
+Knight takes h6
+14.
+f4
+Giving Black 3 equally horrible choices:
+1. Take on f3 and get mated on the g-file.
+2. Take on f4 and get mated on the h-file.
+3. Play g4 and allow the knight to come to g5 and possibly still get mated on the h-file.
+14...
+g4
+15.
+Knight to g5
+Bishop to g7
+16.
+d5
+With a winning attack along the h-file since Black's defences will fall apart after the exchange of the dark-squared bishop.
